@@ -1,0 +1,22 @@
+services:
+  crud:
+    build: ./
+    image: crud-service
+    container_name: crud-service
+    restart: always
+    networks:
+      - crud-net
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres
+    env_file: .env
+  postgres:
+    env_file: .env
+    image: postgres:15
+    container_name: crud-psgr
+    networks:
+      - crud-net
+networks:
+  crud-net:
+    driver: bridge
