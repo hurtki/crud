@@ -1,47 +1,34 @@
 package main
 
 import (
-	"fmt"
 	"os"
-	"time"
 
-	tasks_mod "github.com/hurtki/crud/internal/domain/tasks"
-
+	"github.com/hurtki/crud/internal/app"
+	tasksHandler "github.com/hurtki/crud/internal/app/tasks"
+	"github.com/hurtki/crud/internal/config"
 	"github.com/hurtki/crud/internal/db"
 	"github.com/hurtki/crud/internal/logger"
 )
 
 func main() {
 	logger := logger.NewLogger()
-
+	config := config.NewAppConfig(":8000")
 	logger.Info("logger initialized")
 
 	storage, err := db.GetStorage(*logger)
-	
+
 	if err != nil {
 		logger.Error(err.Error())
 		os.Exit(0)
 	}
-	for {
-		tasks, err := storage.GetTasks()
-		if err != nil {
-			logger.Error("cannot get tasks", "error", err)
-			time.Sleep(5 * time.Second)
-			continue
-		}
-		
-		fmt.Println(tasks)
-		
-		task := tasks_mod.Task{Name: "alex", Text: "hello world"}
 
-		err = storage.AddTask(task) 
-		
-		if err != nil {
-			logger.Error("cannot add task", "error", err)
-			time.Sleep(5 * time.Second)
-			continue
-		}
-		time.Sleep(5 * time.Second)
+	routerSet := app.NewRouteSet()
+
+	tasksHandler := tasksHandler.NewTasksHandler(*logger, config, &storage)
+	routerSet.Add("/tasks/", &tasksHandler)
+
+	router := app.NewRouter(*logger, config, routerSet)
+	if err := router.StartRouting(); err != nil {
+		logger.Error("failed to start server: " + err.Error())
 	}
-	
 }

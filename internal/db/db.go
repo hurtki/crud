@@ -11,7 +11,7 @@ import (
 
 type Storage struct {
 	db     *sql.DB
-	logger slog.Logger
+	logger *slog.Logger
 }
 
 const (
@@ -50,7 +50,7 @@ func GetStorage(logger slog.Logger) (Storage, error) {
 	}
 
 	storage := Storage{
-		logger: logger,
+		logger: logger.With("service", "DataBase"),
 		db:     db,
 	}
 
