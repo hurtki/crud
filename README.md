@@ -1,2 +1,80 @@
-# crud
-CRUD operations realization in go, with cool architecture
+# crudl is a pet project of basic crudl service to rule tasks written in go
+
+## Main points:
+
+- written using DI - Dependency Injection ( full implementation of DI)
+- clean architecture with config, logger, storage, handlers as separeted modules
+- initialization of all dependencies in Main.go
+- docker-compose with Postgres db service
+
+# CRUDL Endpoints:
+
+### **C - `/tasks` `POST`**
+
+`Request:`
+
+```json
+{
+  "name": "New note",
+  "text": "today i wanted to eat the whole day"
+}
+```
+
+`Response:`
+
+```
+{
+    "id": 1
+}
+```
+
+### **R - `/tasks/{i}` `GET`**
+
+`Response:`
+
+```json
+{
+  "name": "Final note",
+  "text": "Today is my last note in this summer"
+}
+```
+
+### **U - `/tasks/{i}` `PATCH`/`PUT`**
+
+`Request:`
+
+```json
+{
+  "name": "Not final note",
+  "text": "I changed my mind"
+}
+```
+
+`Response:`
+`Code:200`
+
+### **D - `/tasks/{i}` `DELETE`**
+
+`Request:`
+`None`
+
+`Response`:
+`Code:200`
+
+### **L - `/tasks` `GET`**
+
+`Request`None
+`Response`:
+
+```json
+[
+  { "Id": 1, "Name": "12.01.2025", "Text": "it's finally 2025" },
+  { "Id": 2, "Name": "12.11.2025", "Text": "i don't belive i survived" }
+]
+```
+
+## Fast start
+
+- set up `.env` using `.env.example`
+- install `docker` + `docker-compose`
+- run `docker compose up --build` or add `-d` flag at the end to leave after all started
