@@ -1,19 +1,26 @@
 package tasksHandler
 
 import (
-	"net/http"
 	"encoding/json"
+	"net/http"
 )
 
 func (h *TasksHandler) HandleGet(res http.ResponseWriter, req *http.Request) {
-	h.logger.Info("IN GET")
+	fn := "internal.app.tasks.getHandler.HandleGet"
 	tasks, err := h.storage.GetTasks()
 	if err != nil {
-		res.WriteHeader(500)
+		h.logger.Error("error from database, when getting tasks", "source", fn)
+		http.Error(res, "error getting tasks", http.StatusInternalServerError)
 		return
 	}
-	data, _ := json.Marshal(tasks)	
+
+	data, err := json.Marshal(tasks)
+
+	if err != nil {
+		h.logger.Error("error while marshaling tasks to json", "source", fn)
+		http.Error(res, "failder to encode tasks", http.StatusInternalServerError)
+		return
+	}
 
 	res.Write([]byte(data))
-	res.WriteHeader(200)
 }

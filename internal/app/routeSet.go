@@ -2,6 +2,7 @@ package app
 
 import "net/http"
 
+// RouteSet is for storing path to handler map
 type RouteSet struct {
 	routes map[string]http.Handler
 }
@@ -13,7 +14,6 @@ func NewRouteSet() RouteSet {
 }
 
 func (s *RouteSet) Add(path string, handler http.Handler) {
-
 	if _, ok := s.routes[path]; ok {
 		panic("add already exist path")
 	}

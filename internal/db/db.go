@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -16,6 +17,7 @@ type Storage struct {
 
 const (
 	DATABASE_CONNECTION_TRIES_COUNT = 10
+	RETRY_TIME_BETWEEN_TRIES = 1 * time.Second
 )
 
 func GetStorage(logger slog.Logger) (Storage, error) {
@@ -33,12 +35,14 @@ func GetStorage(logger slog.Logger) (Storage, error) {
 		db, err = sql.Open("pgx", dsn)
 
 		if err != nil {
-			logger.Warn(fmt.Sprintf("Cannot open database, try number: %d/%d", i+1, DATABASE_CONNECTION_TRIES_COUNT))
+			logger.Warn(fmt.Sprintf("Cannot open database(retrying in 1 second), try number: %d/%d", i+1, DATABASE_CONNECTION_TRIES_COUNT), "source", fn)
+			time.Sleep(RETRY_TIME_BETWEEN_TRIES)
 			continue
 		}
 
 		if err := db.Ping(); err != nil {
-			logger.Warn(fmt.Sprintf("Cannot ping database, try number: %d/%d", i+1, DATABASE_CONNECTION_TRIES_COUNT))
+			logger.Warn(fmt.Sprintf("Cannot ping database, try number: %d/%d", i+1, DATABASE_CONNECTION_TRIES_COUNT), "source", fn)
+			time.Sleep(RETRY_TIME_BETWEEN_TRIES)
 			continue
 		}
 		logger.Info("esablished connection with database")

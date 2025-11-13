@@ -17,13 +17,13 @@ type TasksHandler struct {
 func NewTasksHandler(logger slog.Logger, config config.AppConfig, storage *db.Storage) TasksHandler {
 	return TasksHandler{
 		config: config,
-		logger: logger.With("service", "root_handler"),
+		// wrap of logger with "serivice" field
+		logger:  logger.With("service", "tasksHandler"),
 		storage: storage,
 	}
 }
 
 func (h *TasksHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	h.logger.Info("started serving in tasks handler")
 	switch req.Method {
 	case "GET":
 		h.HandleGet(res, req)
