@@ -5,8 +5,9 @@ import (
 	"net/http"
 )
 
-func (h *TasksHandler) HandleGet(res http.ResponseWriter, req *http.Request) {
-	fn := "internal.app.tasks.getHandler.HandleGet"
+func (h *TasksHandler) HandleList(res http.ResponseWriter, req *http.Request) {
+	fn := "internal.app.tasks.getHandler.HandleList"
+
 	tasks, err := h.storage.GetTasks()
 	if err != nil {
 		h.logger.Error("error from database, when getting tasks", "source", fn)

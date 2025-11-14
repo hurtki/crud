@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/hurtki/crud/internal/app"
+	"github.com/hurtki/crud/internal/app/routeSet"
 	tasksHandler "github.com/hurtki/crud/internal/app/tasks"
 	"github.com/hurtki/crud/internal/config"
 	"github.com/hurtki/crud/internal/db"
@@ -22,10 +23,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	routerSet := app.NewRouteSet()
+	routerSet := routeSet.NewRouteSet()
 
 	tasksHandler := tasksHandler.NewTasksHandler(*logger, config, &storage)
-	routerSet.Add("/tasks/", &tasksHandler)
+	routerSet.Add("/tasks/{string}/", tasksHandler.ServeReadUpdateDelete)
+	routerSet.Add("/tasks/", tasksHandler.ServeCreateList)
 
 	router := app.NewRouter(*logger, config, routerSet)
 	if err := router.StartRouting(); err != nil {

@@ -1,9 +1,12 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
+
+	"github.com/hurtki/crud/internal/app/routeSet"
 
 	"github.com/hurtki/crud/internal/config"
 )
@@ -13,10 +16,10 @@ import (
 type Router struct {
 	logger   *slog.Logger
 	config   config.AppConfig
-	routeSet RouteSet
+	routeSet routeSet.RouteSet
 }
 
-func NewRouter(logger slog.Logger, cgf config.AppConfig, routeSet RouteSet) Router {
+func NewRouter(logger slog.Logger, cgf config.AppConfig, routeSet routeSet.RouteSet) Router {
 
 	router := Router{
 		// wrap of logger with "service" field
@@ -33,8 +36,8 @@ func (r *Router) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	r.logger.Info("INCOMING REQUEST:", "path", req.URL.Path, "method", req.Method, "ip", req.RemoteAddr)
 
-	handler, err := r.routeSet.Handler(req.URL.Path)
-	if err == ErrNotFound {
+	handler, parameter, err := r.routeSet.Handler(req.URL.Path)
+	if err == routeSet.ErrNotFound {
 		http.NotFound(res, req)
 		return
 	} else if err != nil {
@@ -42,8 +45,13 @@ func (r *Router) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		// even with error also sending, that we cannot found the route
 		http.NotFound(res, req)
 	}
-	
-	// Serving with, appropriate to route, handler 
+
+	if parameter != nil {
+		ctx := context.WithValue(req.Context(), "urlParameter", parameter)
+		req = req.WithContext(ctx)
+	}
+
+	// Serving with, appropriate to route, handler
 	handler.ServeHTTP(res, req)
 }
 

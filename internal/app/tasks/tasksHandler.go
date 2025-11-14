@@ -23,11 +23,26 @@ func NewTasksHandler(logger slog.Logger, config config.AppConfig, storage *db.St
 	}
 }
 
-func (h *TasksHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (h *TasksHandler) ServeReadUpdateDelete(res http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "GET":
-		h.HandleGet(res, req)
+		h.HandleRead(res, req)
+	case "PUT", "PATCH":
+		h.HandleUpdate(res, req)
+	case "DELETE":
+		h.HandleDelete(res, req)
+	default:
+		http.NotFound(res, req)
+	}
+}
+
+func (h *TasksHandler) ServeCreateList(res http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case "GET":
+		h.HandleList(res, req)
 	case "POST":
-		h.HandlePost(res, req)
+		h.HandleCreate(res, req)
+	default:
+		http.NotFound(res, req)
 	}
 }
