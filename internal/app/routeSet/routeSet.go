@@ -14,12 +14,17 @@ func NewRouteSet() RouteSet {
 	return RouteSet{routes: []route{}}
 }
 
-// TODO: write docs how to write path
+// Add(pattern, handler) creates a new route in routeSet with a pattern
+// pattern can contain one of parameters: {num}, {string}
+// pattern can contain strict parts: /tasks/, /api/users/
+// examples: 'api/users/3', 'post/{string}'
 func (s *RouteSet) Add(path string, handler http.HandlerFunc) {
 	route := NewRoute(path, handler)
 	s.routes = append(s.routes, route)
 }
 
+// Handler(path string) tris to match given path specified with Add() routes
+// returns a handler, url parameter(if there is no then nil), error (usually ErrNotFound)
 func (s *RouteSet) Handler(path string) (http.Handler, any, error) {
 	for _, route := range s.routes {
 

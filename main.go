@@ -26,7 +26,7 @@ func main() {
 	routerSet := routeSet.NewRouteSet()
 
 	tasksHandler := tasksHandler.NewTasksHandler(*logger, config, &storage)
-	routerSet.Add("/tasks/{string}/", tasksHandler.ServeReadUpdateDelete)
+	routerSet.Add("/", tasksHandler.ServeReadUpdateDelete)
 	routerSet.Add("/tasks/", tasksHandler.ServeCreateList)
 
 	router := app.NewRouter(*logger, config, routerSet)

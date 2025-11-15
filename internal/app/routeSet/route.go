@@ -1,18 +1,29 @@
 package routeSet
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 )
 
+// route stores sample of url route
+// and matches it with a handler
 type route struct {
 	parts   []routePart
 	handler http.HandlerFunc
 }
 
+// NewRoute(pattern, handler) creates a new route with a pattern
+// pattern can contain one of parameters: {num}, {string}
+// pattern can contain strict parts: /tasks/, /api/users/
+// examples: 'api/users/3', 'post/{string}'
 func NewRoute(pattern string, handler http.HandlerFunc) route {
-	pattern = strings.Trim(pattern, "/")
-	patternParts := strings.Split(pattern, "/")
+	patternParts := strings.FieldsFunc(pattern, func(r rune) bool {
+		return r == '/'
+	})
+
+	fmt.Println("creating route with len of patternParts:", len(patternParts))
+	fmt.Println("patternParts: ", patternParts)
 
 	routeParts := []routePart{}
 	wasParameter := false
@@ -33,16 +44,18 @@ func NewRoute(pattern string, handler http.HandlerFunc) route {
 		}
 		routeParts = append(routeParts, routePart)
 	}
-
+	fmt.Println("route parts: ", routeParts)
 	return route{
 		parts:   routeParts,
 		handler: handler,
 	}
 }
 
+// Match(path) checks if given path matches pattern of the route
 func (r *route) Match(path string) (bool, any) {
-	path = strings.Trim(path, "/")
-	pathParts := strings.Split(path, "/")
+	pathParts := strings.FieldsFunc(path, func(r rune) bool {
+		return r == '/'
+	})
 
 	var resParameter any = nil
 

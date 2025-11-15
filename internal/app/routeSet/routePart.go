@@ -25,22 +25,25 @@ type routePart struct {
 	parameterType ParameterType
 }
 
+// NewRoutePart creates a part of the route
+// part shoud be or a string of unreserved URL symbols, so it will be strict
+// or part can be a parameter: {num}, {string}
 func NewRoutePart(part string) (routePart, error) {
-	
 	if part[0] == '{' && part[len(part)-1] == '}' {
 		center := part[1 : len(part)-1]
 
-		if center == "num" {
+		switch center {
+		case "num":
 			return routePart{
 				Strict:        false,
 				parameterType: NumberParameter,
 			}, nil
-		} else if center == "string" {
+		case "string":
 			return routePart{
 				Strict:        false,
 				parameterType: StringParameter,
 			}, nil
-		} else {
+		default:
 			return routePart{}, NewErrorBadRoutePart("part wrapped with {} perceived parameter part, and shoud be or {num} or {string}")
 		}
 	} else if urlRegexp.MatchString(part) {

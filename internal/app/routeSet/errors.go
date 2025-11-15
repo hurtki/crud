@@ -20,5 +20,5 @@ func NewErrorBadRoutePart(comment string) ErrorBadRoutePart {
 }
 
 func (e ErrorBadRoutePart) Error() string {
-	return fmt.Sprint("error, while creating new route part occured, comment: %s", e.comment)
+	return fmt.Sprintf("error, while creating new route part occured, comment: %s", e.comment)
 }
