@@ -1,49 +1,121 @@
 package db
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/hurtki/crud/internal/domain/tasks"
 )
 
-func (s *Storage) GetTasks() ([]tasks.Task, error) {
-	fn := "internal.db.task.GetTasks"
+func (s *Storage) List() ([]tasks.Task, error) {
+	fn := "internal.db.task.Storage.List"
 	res, err := s.db.Query(`
-	SELECT * FROM tasks;
+	SELECT id, name, text FROM tasks;
 	`)
+
 	if err != nil {
-		return nil, fmt.Errorf("%s:%w", fn, err)
+		return nil, s.handleDbErr(fn, err)
 	}
-	task := tasks.Task{}
-	tasks := []tasks.Task{}
+	tasksSlice := []tasks.Task{}
 
 	for res.Next() {
-
+		task := tasks.Task{}
 		if err := res.Scan(&task.Id, &task.Name, &task.Text); err != nil {
-			return nil, fmt.Errorf("%s:%w", fn, err)
+			s.logger.Error("unexcpected error from scan", "source", fn, "err", err)
+			return nil, err
 		}
-
-		tasks = append(tasks, task)
+		tasksSlice = append(tasksSlice, task)
 	}
 
-	return tasks, nil
+	if err := res.Err(); err != nil {
+		s.logger.Error("error after iterating by rows", "source", fn, "err", err)
+		return nil, err
+	}
+
+	return tasksSlice, nil
 }
 
-func (s *Storage) AddTask(task tasks.Task) error {
-	fn := "internal.db.task.AddTask"
+func (s *Storage) Create(task tasks.Task) (tasks.Task, error) {
+	fn := "internal.db.task.Storage.Create"
 
-	res, err := s.db.Exec(`
+	row := s.db.QueryRow(`
 	INSERT INTO tasks (name, text)
-	VALUES ($1, $2);
+	VALUES ($1, $2)
+	RETURNING id;
 	`, task.Name, task.Text)
 
+	err := row.Scan(&task.Id)
+
 	if err != nil {
-		return fmt.Errorf("%s:%w", fn, err)
+		return tasks.Task{}, s.handleDbErr(fn, err)
 	}
 
-	if rowsAffected, err := res.RowsAffected(); err != nil || rowsAffected == 0 {
-		return fmt.Errorf("%s:%w", fn, ErrorNoRowsAffected)
+	return task, nil
+}
+
+func (s *Storage) Update(task tasks.Task) (tasks.Task, error) {
+	fn := "internal.db.task.Storage.Update"
+
+	res, err := s.db.Exec(`
+	UPDATE tasks
+	SET name = $2,
+		text = $3
+	WHERE id = $1;
+	`, task.Id, task.Name, task.Text,
+	)
+
+	if err != nil {
+		return tasks.Task{}, s.handleDbErr(fn, err)
+	}
+
+	if rowsAffected, err := res.RowsAffected(); err != nil || rowsAffected < 1 {
+		return tasks.Task{}, ErrNoRowsAffected
+	}
+
+	return task, nil
+}
+
+func (s *Storage) GetByID(id int) (tasks.Task, error) {
+	fn := "internal.db.task.Storage.GetByID"
+
+	row := s.db.QueryRow(`
+	SELECT id, name, text FROM tasks
+	WHERE id = $1;
+	`, id)
+
+	var task tasks.Task
+	err := row.Scan(&task.Id, &task.Name, &task.Text)
+
+	if err != nil {
+		return tasks.Task{}, s.handleDbErr(fn, err)
+	}
+
+	return task, nil
+}
+
+func (s *Storage) Delete(id int) error {
+	fn := "internal.db.task.Storage.Delete"
+	res, err := s.db.Exec(`
+	DELETE FROM tasks
+	WHERE id = $1
+	`, id)
+	if err != nil {
+		return s.handleDbErr(fn, err)
+	}
+
+	if rowsAffected, err := res.RowsAffected(); err != nil || rowsAffected < 1 {
+		return ErrNoRowsAffected
 	}
 
 	return nil
+}
+
+func (s *Storage) handleDbErr(fn string, err error) error {
+	if dbErr, ok := ToDbError(err); ok {
+		var syntaxErr *ErrSyntaxSql
+		if errors.As(dbErr, &syntaxErr) {
+			s.logger.Error("sql syntax error", "source", fn, "err", dbErr)
+		}
+		return dbErr
+	}
+	return err
 }
