@@ -1,4 +1,4 @@
-package db
+package tasks_repo
 
 import (
 	"database/sql"
@@ -10,17 +10,17 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-type Storage struct {
+type TaskStorage struct {
 	db     *sql.DB
 	logger *slog.Logger
 }
 
 const (
 	DATABASE_CONNECTION_TRIES_COUNT = 10
-	RETRY_TIME_BETWEEN_TRIES = 1 * time.Second
+	RETRY_TIME_BETWEEN_TRIES        = 1 * time.Second
 )
 
-func GetStorage(logger slog.Logger) (Storage, error) {
+func GetTaskStorage(logger slog.Logger) (TaskStorage, error) {
 	fn := "internal.db.db.GetStorage"
 	postgres_user := os.Getenv("POSTGRES_USER")
 	postgres_password := os.Getenv("POSTGRES_PASSWORD")
@@ -50,10 +50,10 @@ func GetStorage(logger slog.Logger) (Storage, error) {
 	}
 
 	if err != nil {
-		return Storage{}, fmt.Errorf("%s:%w", fn, err)
+		return TaskStorage{}, fmt.Errorf("%s:%w", fn, err)
 	}
 
-	storage := Storage{
+	storage := TaskStorage{
 		logger: logger.With("service", "DataBase"),
 		db:     db,
 	}
@@ -68,7 +68,7 @@ func GetStorage(logger slog.Logger) (Storage, error) {
 	`)
 
 	if err != nil {
-		return Storage{}, fmt.Errorf("cannot create notes table: %s", err.Error())
+		return TaskStorage{}, fmt.Errorf("cannot create notes table: %s", err.Error())
 	}
 
 	return storage, nil

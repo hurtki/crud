@@ -4,22 +4,19 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/hurtki/crud/internal/config"
-	"github.com/hurtki/crud/internal/db"
+	"github.com/hurtki/crud/internal/domain/tasks"
 )
 
 type TasksHandler struct {
-	config  config.AppConfig
-	logger  *slog.Logger
-	storage *db.Storage
+	logger   *slog.Logger
+	useCases tasks.TaskUseCases
 }
 
-func NewTasksHandler(logger slog.Logger, config config.AppConfig, storage *db.Storage) TasksHandler {
+func NewTasksHandler(logger slog.Logger, useCases tasks.TaskUseCases) TasksHandler {
 	return TasksHandler{
-		config: config,
 		// wrap of logger with "serivice" field
-		logger:  logger.With("service", "tasksHandler"),
-		storage: storage,
+		logger:   logger.With("service", "tasksHandler"),
+		useCases: useCases,
 	}
 }
 
@@ -27,7 +24,7 @@ func (h *TasksHandler) ServeReadUpdateDelete(res http.ResponseWriter, req *http.
 	switch req.Method {
 	case "GET":
 		h.HandleRead(res, req)
-	case "PUT", "PATCH":
+	case "PUT":
 		h.HandleUpdate(res, req)
 	case "DELETE":
 		h.HandleDelete(res, req)

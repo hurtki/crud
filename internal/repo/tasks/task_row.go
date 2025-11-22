@@ -1,4 +1,4 @@
-package db
+package tasks_repo
 
 import (
 	"github.com/hurtki/crud/internal/domain/tasks"

@@ -1,13 +1,14 @@
-package db
+package tasks_repo
 
 import (
 	"errors"
 
 	"github.com/hurtki/crud/internal/domain/tasks"
+	repoerr "github.com/hurtki/crud/internal/repo"
 )
 
-func (s *Storage) List() ([]tasks.Task, error) {
-	fn := "internal.db.task.Storage.List"
+func (s *TaskStorage) List() ([]tasks.Task, error) {
+	fn := "internal.repo.tasks.TaskStorage.List"
 	res, err := s.db.Query(`
 	SELECT id, name, text FROM tasks;
 	`)
@@ -34,8 +35,8 @@ func (s *Storage) List() ([]tasks.Task, error) {
 	return tasksSlice, nil
 }
 
-func (s *Storage) Create(task tasks.Task) (tasks.Task, error) {
-	fn := "internal.db.task.Storage.Create"
+func (s *TaskStorage) Create(task tasks.Task) (tasks.Task, error) {
+	fn := "internal.repo.tasks.TaskStorage.Create"
 
 	row := s.db.QueryRow(`
 	INSERT INTO tasks (name, text)
@@ -52,8 +53,8 @@ func (s *Storage) Create(task tasks.Task) (tasks.Task, error) {
 	return task, nil
 }
 
-func (s *Storage) Update(task tasks.Task) (tasks.Task, error) {
-	fn := "internal.db.task.Storage.Update"
+func (s *TaskStorage) Update(task tasks.Task) (tasks.Task, error) {
+	fn := "internal.repo.tasks.TaskStorage.Update"
 
 	res, err := s.db.Exec(`
 	UPDATE tasks
@@ -68,14 +69,14 @@ func (s *Storage) Update(task tasks.Task) (tasks.Task, error) {
 	}
 
 	if rowsAffected, err := res.RowsAffected(); err != nil || rowsAffected < 1 {
-		return tasks.Task{}, ErrNoRowsAffected
+		return tasks.Task{}, repoerr.ErrNothingChanged
 	}
 
 	return task, nil
 }
 
-func (s *Storage) GetByID(id int) (tasks.Task, error) {
-	fn := "internal.db.task.Storage.GetByID"
+func (s *TaskStorage) GetByID(id int) (tasks.Task, error) {
+	fn := "internal.repo.tasks.TaskStorage.GetByID"
 
 	row := s.db.QueryRow(`
 	SELECT id, name, text FROM tasks
@@ -92,8 +93,9 @@ func (s *Storage) GetByID(id int) (tasks.Task, error) {
 	return task, nil
 }
 
-func (s *Storage) Delete(id int) error {
-	fn := "internal.db.task.Storage.Delete"
+func (s *TaskStorage) Delete(id int) error {
+	fn := "internal.repo.tasks.TaskStorage.Delete"
+
 	res, err := s.db.Exec(`
 	DELETE FROM tasks
 	WHERE id = $1
@@ -103,19 +105,17 @@ func (s *Storage) Delete(id int) error {
 	}
 
 	if rowsAffected, err := res.RowsAffected(); err != nil || rowsAffected < 1 {
-		return ErrNoRowsAffected
+		return repoerr.ErrNothingChanged
 	}
 
 	return nil
 }
 
-func (s *Storage) handleDbErr(fn string, err error) error {
-	if dbErr, ok := ToDbError(err); ok {
-		var syntaxErr *ErrSyntaxSql
-		if errors.As(dbErr, &syntaxErr) {
-			s.logger.Error("sql syntax error", "source", fn, "err", dbErr)
-		}
-		return dbErr
+func (s *TaskStorage) handleDbErr(fn string, err error) error {
+	repoErr := toRepoError(err)
+	var internalErr *repoerr.ErrRepoInternal
+	if errors.As(repoErr, &internalErr) {
+		s.logger.Error("repo internal error", "source", fn, "err", repoErr)
 	}
-	return err
+	return repoErr
 }
