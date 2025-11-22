@@ -22,10 +22,12 @@ const (
 
 func GetTaskStorage(logger slog.Logger) (TaskStorage, error) {
 	fn := "internal.db.db.GetStorage"
+	db_host := os.Getenv("DB_HOST")
 	postgres_user := os.Getenv("POSTGRES_USER")
 	postgres_password := os.Getenv("POSTGRES_PASSWORD")
 	postgres_db := os.Getenv("POSTGRES_DB")
-	dsn := fmt.Sprintf("postgres://%s:%s@postgres:5432/%s", postgres_user, postgres_password, postgres_db)
+	db_port := os.Getenv("DB_PORT")
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", postgres_user, postgres_password, db_host, db_port, postgres_db)
 
 	var db *sql.DB
 	var err error
