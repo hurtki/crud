@@ -16,7 +16,7 @@ func NewTaskUseCases(repo TaskRepository) TaskUseCases {
 
 func (c *TaskUseCases) CreateTask(input CreateTaskInput) (Task, error) {
 	if input.Name == "" {
-		return Task{}, ErrFieldCannotBeEmpty{Field: "name"}
+		return Task{}, &ErrFieldCannotBeEmpty{Field: "name"}
 	}
 	task := NewTask(0, input.Name, input.Text)
 
@@ -27,7 +27,7 @@ func (c *TaskUseCases) CreateTask(input CreateTaskInput) (Task, error) {
 
 		switch {
 		case errors.As(err, &errEmptyField):
-			err = ErrFieldCannotBeEmpty{Field: errEmptyField.Field}
+			err = &ErrFieldCannotBeEmpty{Field: errEmptyField.Field}
 		case errors.As(err, &errRepoInternal):
 			err = ErrCannotCreateTask
 		default:
@@ -80,7 +80,7 @@ func (c *TaskUseCases) UpdateTask(input UpdateTaskInput) (Task, error) {
 		return Task{}, ErrTaskIdSmallerThanNull
 	}
 	if input.Name == "" {
-		return Task{}, ErrFieldCannotBeEmpty{Field: "name"}
+		return Task{}, &ErrFieldCannotBeEmpty{Field: "name"}
 	}
 	task := NewTask(input.Id, input.Name, input.Text)
 	task, err := c.repo.Update(task)
@@ -91,9 +91,9 @@ func (c *TaskUseCases) UpdateTask(input UpdateTaskInput) (Task, error) {
 
 		switch {
 		case errors.As(err, &errConflictValue):
-			err = ErrTaskWithThisValueAlreadyExists{Field: errConflictValue.Field}
+			err = &ErrTaskWithThisValueAlreadyExists{Field: errConflictValue.Field}
 		case errors.As(err, &errEmptyField):
-			err = ErrFieldCannotBeEmpty{Field: errEmptyField.Field}
+			err = &ErrFieldCannotBeEmpty{Field: errEmptyField.Field}
 		case errors.As(err, &errRepoInternal):
 			err = ErrCannotUpdateTask
 		// TODO, need to stay only one of this to repo errors, very strange logic
