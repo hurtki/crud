@@ -65,6 +65,7 @@ func GetTaskStorage(logger slog.Logger) (TaskStorage, error) {
 		name TEXT NOT NULL,
 		text TEXT NOT NULL
 	);
+	CREATE INDEX idx_tasks_id ON tasks(id);
 	`)
 
 	if err != nil {
