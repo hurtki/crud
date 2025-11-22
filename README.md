@@ -39,7 +39,7 @@
 }
 ```
 
-### **U - `/tasks/{i}` `PATCH`/`PUT`**
+### **U - `/tasks/{i}` `PUT`**
 
 `Request:`
 
@@ -71,6 +71,16 @@
   { "Id": 1, "Name": "12.01.2025", "Text": "it's finally 2025" },
   { "Id": 2, "Name": "12.11.2025", "Text": "i don't belive i survived" }
 ]
+```
+
+### Errors:
+
+`Response`:
+
+```json
+{
+  "error": "error text"
+}
 ```
 
 ## Fast start
