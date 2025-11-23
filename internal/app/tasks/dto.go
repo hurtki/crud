@@ -5,10 +5,6 @@ type CreateTaskRequest struct {
 	Text string `json:"text"`
 }
 
-type CreateTaskResponse struct {
-	Id int `json:"id"`
-}
-
 type PutTaskRequest struct {
 	Name string `json:"name"`
 	Text string `json:"text"`

@@ -24,7 +24,9 @@
 
 ```
 {
-    "id": 1
+    "id": 1,
+    "name": "note",
+    "text": "that's all!"
 }
 ```
 
