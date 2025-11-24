@@ -27,7 +27,7 @@ func (h *TasksHandler) HandleList(res http.ResponseWriter, req *http.Request) {
 		writeJSONError(res, http.StatusInternalServerError, "cannot serialize tasks to json")
 		return
 	}
-	
+
 	res.WriteHeader(http.StatusOK)
 	res.Write(serialized)
 }

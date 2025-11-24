@@ -10,7 +10,7 @@ type GetTaskInput struct {
 }
 
 type UpdateTaskInput struct {
-	Id int
+	Id   int
 	Name string
 	Text string
 }

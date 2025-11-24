@@ -1,10 +1,8 @@
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/hurtki/routego v0.0.1 h1:c115Rx+noxtnrYJMVQO/bT8EWEUnvoM4om99GDvD9rQ=
-github.com/hurtki/routego v0.0.1/go.mod h1:Fff+jAYQ/un5RKRRj6CrS4Cc0+UwLZ/JvsuQNOitvn0=
-github.com/hurtki/routego v0.0.2 h1:eMKp8we7pxvrMjKnofuh2qbTxXIHmCgoX1NVJVlk7cc=
-github.com/hurtki/routego v0.0.2/go.mod h1:Fff+jAYQ/un5RKRRj6CrS4Cc0+UwLZ/JvsuQNOitvn0=
+github.com/hurtki/routego v0.0.3 h1:X89rDj1QW4gD91g1FCJ0vejtFjjSVUYi7DTpUjRaMJ8=
+github.com/hurtki/routego v0.0.3/go.mod h1:Fff+jAYQ/un5RKRRj6CrS4Cc0+UwLZ/JvsuQNOitvn0=
 github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsIM=
 github.com/jackc/pgpassfile v1.0.0/go.mod h1:CEx0iS5ambNFdcRtxPj5JhEz+xB6uRky5eyVu/W2HEg=
 github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 h1:iCEnooe7UlwOQYpKFhBabPMi4aNAfoODPEFNiAnClxo=

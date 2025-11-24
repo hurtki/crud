@@ -6,12 +6,10 @@ type Task struct {
 	Text string
 }
 
-
 func NewTask(Id int, Name string, Text string) Task {
 	return Task{
-		Id: Id,
+		Id:   Id,
 		Name: Name,
 		Text: Text,
 	}
 }
-

@@ -5,7 +5,6 @@ import (
 
 	tasksHandler "github.com/hurtki/crud/internal/app/tasks"
 	"github.com/hurtki/routego"
-	"github.com/hurtki/routego/routeSet"
 
 	//"github.com/hurtki/crud/internal/config"
 	"github.com/hurtki/crud/internal/domain/tasks"
@@ -29,14 +28,14 @@ func main() {
 
 	tasksUseCases := tasks.NewTaskUseCases(&storage)
 
-	routeSet := routeSet.NewRouteSet()
+	routeSet := routego.NewRouteSet()
 
 	tasksHandler := tasksHandler.NewTasksHandler(*logger, tasksUseCases)
 	routeSet.Add("/tasks/{num}", tasksHandler.ServeReadUpdateDelete)
 	routeSet.Add("/tasks/", tasksHandler.ServeCreateList)
 
 	routegoConfig := routego.NewRoutegoConfig(":8000")
-	router := routego.NewRouter(*logger, routegoConfig, routeSet)
+	router := routego.NewRouter(routegoConfig, routeSet)
 	if err := router.StartRouting(); err != nil {
 		logger.Error("failed to start server: " + err.Error())
 	}
