@@ -7,11 +7,13 @@ import (
 	repoerr "github.com/hurtki/crud/internal/repo"
 )
 
-func (s *TaskStorage) List() ([]tasks.Task, error) {
+func (s *TaskStorage) List(pag tasks.Pagination) ([]tasks.Task, error) {
 	fn := "internal.repo.tasks.TaskStorage.List"
 	res, err := s.db.Query(`
-	SELECT id, name, text FROM tasks;
-	`)
+	SELECT id, name, text FROM tasks
+	ORDER BY id ASC
+	LIMIT $1 OFFSET $2;
+	`, pag.Limit, pag.Cursor)
 
 	if err != nil {
 		return nil, s.handleDbErr(fn, err)

@@ -23,7 +23,8 @@ var (
 	ErrCannotGetTasks   = errors.New("Cannot get tasks")
 	ErrCannotUpdateTask = errors.New("cannot update task")
 	ErrCannotDeleteTask = errors.New("cannot delete task")
-
+	
+	ErrPageCannotBeSmallerThanNull = errors.New("page cannot be smaller than null")
 	ErrTaskWithIdNotFound    = errors.New("task with given id not found")
 	ErrTaskIdSmallerThanNull = errors.New("Task id smaller than null")
 )

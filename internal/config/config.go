@@ -4,19 +4,25 @@ import (
 	"regexp"
 )
 
+type AppConfig struct {
+	Port              string // :port_id
+	TasksPerPageCount int    // count of tasks that will be on list endpoint on every page ( limit )
+}
+
 // NewAppConfig creates a new AppConfig entity with validation
 // all AppConfig fields and how they should look see in AppConfig structure
-func NewAppConfig(port string) AppConfig {
+func NewAppConfig(port string, tasksPerPageCount int) *AppConfig {
 	port_reg_exp := regexp.MustCompile(`^:\d{1,5}$`)
 	if !port_reg_exp.MatchString(port) {
 		panic("wrong port specified")
 	}
 
-	return AppConfig{
-		Port: port,
+	if tasksPerPageCount < 1 {
+		panic("tasks per page count should be bigger than null")
 	}
-}
 
-type AppConfig struct {
-	Port string // :port_id
+	return &AppConfig{
+		Port:              port,
+		TasksPerPageCount: tasksPerPageCount,
+	}
 }

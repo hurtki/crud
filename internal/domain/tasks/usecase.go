@@ -3,15 +3,17 @@ package tasks
 import (
 	"errors"
 
+	"github.com/hurtki/crud/internal/config"
 	repoerr "github.com/hurtki/crud/internal/repo"
 )
 
 type TaskUseCases struct {
-	repo TaskRepository
+	repo      TaskRepository
+	appConfig *config.AppConfig
 }
 
-func NewTaskUseCases(repo TaskRepository) TaskUseCases {
-	return TaskUseCases{repo: repo}
+func NewTaskUseCases(repo TaskRepository, appConfig *config.AppConfig) TaskUseCases {
+	return TaskUseCases{repo: repo, appConfig: appConfig}
 }
 
 func (c *TaskUseCases) CreateTask(input CreateTaskInput) (Task, error) {
@@ -61,8 +63,15 @@ func (c *TaskUseCases) GetTask(input GetTaskInput) (Task, error) {
 	return task, nil
 }
 
-func (c *TaskUseCases) GetTasks() ([]Task, error) {
-	tasks, err := c.repo.List()
+func (c *TaskUseCases) ListTasks(page int) ([]Task, error) {
+	if page < 0 {
+		return nil, ErrPageCannotBeSmallerThanNull
+	}
+	offset := page * c.appConfig.TasksPerPageCount
+
+	pag := Pagination{Limit: c.appConfig.TasksPerPageCount, Cursor: offset}
+
+	tasks, err := c.repo.List(pag)
 
 	if err != nil {
 		var errRepoInternal *repoerr.ErrRepoInternal
