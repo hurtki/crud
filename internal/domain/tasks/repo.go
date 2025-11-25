@@ -9,6 +9,6 @@ type TaskRepository interface {
 }
 
 type Pagination struct {
-    Limit  int
-    Cursor int 
+	Limit  int
+	Cursor int
 }
