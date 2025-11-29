@@ -7,7 +7,7 @@ services:
     networks:
       - crud-net
     ports:
-      - 8000:8000
+      - 80:80
     depends_on:
       - postgres
     env_file: .env
@@ -17,6 +17,11 @@ services:
     container_name: crud-psgr
     networks:
       - crud-net
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
+    name: postgres_db_crud
 networks:
   crud-net:
     driver: bridge

@@ -24,7 +24,7 @@ const (
 
 func main() {
 	logger := logger.NewLogger()
-	config := config.NewAppConfig(":8000", tasksPerPageCount, time.Second*5)
+	config := config.NewAppConfig(":80", tasksPerPageCount, time.Second*5)
 	logger.Info("logger initialized")
 
 	storage, err := tasks_repo.GetTaskStorage(*logger)
