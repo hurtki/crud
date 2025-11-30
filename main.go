@@ -4,7 +4,6 @@ import (
 	"context"
 	"os"
 	"os/signal"
-	"time"
 
 	tasksHandler "github.com/hurtki/crud/internal/app/tasks"
 	"github.com/hurtki/crud/internal/config"
@@ -18,19 +17,20 @@ import (
 	"github.com/hurtki/crud/internal/logger"
 )
 
-const (
-	tasksPerPageCount int = 4
-)
-
 func main() {
 	logger := logger.NewLogger()
-	config := config.NewAppConfig(":80", tasksPerPageCount, time.Second*5)
+	// config := config.NewAppConfig(":80", tasksPerPageCount, time.Second*5)
+	config, err := config.LoadConfig("config.yaml")
+	if err != nil {
+		logger.Error("can't load config, exiting", "err", err)
+	}
+
 	logger.Info("logger initialized")
 
 	storage, err := tasks_repo.GetTaskStorage(*logger)
 
 	if err != nil {
-		logger.Info("Can't initialize storage, exiting")
+		logger.Error("Can't initialize storage, exiting", "err", err)
 		os.Exit(0)
 	}
 

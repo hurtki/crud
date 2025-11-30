@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/hurtki/crud/internal/config"
+	"github.com/rs/cors"
 )
 
 type Server struct {
@@ -14,7 +15,15 @@ type Server struct {
 }
 
 func NewServer(router http.Handler, config config.AppConfig) *Server {
-	httpServer := http.Server{Addr: config.Port, Handler: router}
+	httpServer := http.Server{Addr: config.Port}
+
+	if config.Cors {
+		c := cors.New(cors.Options{AllowedOrigins: config.CorsOrigins, AllowCredentials: true})
+		httpServer.Handler = c.Handler(router)
+	} else {
+		httpServer.Handler = router
+	}
+
 	return &Server{
 		httpServer: &httpServer,
 	}

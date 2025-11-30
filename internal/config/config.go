@@ -1,31 +1,48 @@
 package config
 
 import (
+	"os"
 	"regexp"
 	"time"
+
+	"gopkg.in/yaml.v2"
 )
 
 type AppConfig struct {
-	Port                 string        // :port_id
-	TasksPerPageCount    int           // count of tasks that will be on list endpoint on every page ( limit )
-	ServerTimeToShutDown time.Duration // time to wait to close http server, when gracefull shutdown intialized
+	Port                 string        `yaml:"port"`              // :port_id
+	TasksPerPageCount    int           `yaml:"tasks_per_page"`    // count of tasks that will be on list endpoint on every page ( limit )
+	ServerTimeToShutDown time.Duration `yaml:"time_to_shut_down"` // time to wait to close http server, when gracefull shutdown intialized
+	Cors                 bool          `yaml:"use_cors"`          // if the server will use cors midlleware
+	CorsOrigins          []string      `yaml:"cors_origins"`      // if cors is on, what origins will it contain
 }
 
-// NewAppConfig creates a new AppConfig entity with validation
-// all AppConfig fields and how they should look see in AppConfig structure
-func NewAppConfig(port string, tasksPerPageCount int, serverTimeToShutDown time.Duration) *AppConfig {
-	port_reg_exp := regexp.MustCompile(`^:\d{1,5}$`)
-	if !port_reg_exp.MatchString(port) {
-		panic("wrong port specified")
+func LoadConfig(path string) (*AppConfig, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
 	}
 
-	if tasksPerPageCount < 1 {
-		panic("tasks per page count should be bigger than null")
+	var cfg AppConfig
+	if err := yaml.Unmarshal(data, &cfg); err != nil {
+		return nil, err
 	}
 
-	return &AppConfig{
-		Port:                 port,
-		TasksPerPageCount:    tasksPerPageCount,
-		ServerTimeToShutDown: serverTimeToShutDown,
+	portRe := regexp.MustCompile(`^:\d{1,5}$`)
+	if !portRe.MatchString(cfg.Port) {
+		return nil, ErrWrongPortSpecified
 	}
+
+	if cfg.TasksPerPageCount < 1 {
+		return nil, ErrTasksPerPageSmallerThanOne
+	}
+
+	if cfg.ServerTimeToShutDown <= 0 {
+		return nil, ErrShutdownTimeSmallerThanNull
+	}
+
+	if cfg.Cors && len(cfg.CorsOrigins) == 0 {
+		return nil, ErrNoOriginsWithCors
+	}
+
+	return &cfg, nil
 }
