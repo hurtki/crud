@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"regexp"
 	"time"
@@ -45,4 +46,20 @@ func LoadConfig(path string) (*AppConfig, error) {
 	}
 
 	return &cfg, nil
+}
+
+func (c AppConfig) String() string {
+	return fmt.Sprintf(
+		"AppConfig: "+
+			"  Port: %s "+
+			"  TasksPerPageCount: %d "+
+			"  ServerTimeToShutDown: %s "+
+			"  Cors: %t "+
+			"  CorsOrigins: %v ",
+		c.Port,
+		c.TasksPerPageCount,
+		c.ServerTimeToShutDown,
+		c.Cors,
+		c.CorsOrigins,
+	)
 }

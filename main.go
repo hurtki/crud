@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 
@@ -24,6 +25,7 @@ func main() {
 	if err != nil {
 		logger.Error("can't load config, exiting", "err", err)
 	}
+	logger.Info(fmt.Sprintf("loaded app config: %s", config.String()))
 
 	logger.Info("logger initialized")
 
