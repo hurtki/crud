@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/hurtki/crud/internal/config"
@@ -19,12 +20,14 @@ func NewServer(router http.Handler, config config.AppConfig) *Server {
 
 	if config.Cors {
 		c := cors.New(cors.Options{AllowedOrigins: config.CorsOrigins, AllowCredentials: true})
+		fmt.Println("starting with cors")
 		httpServer.Handler = c.Handler(router)
 	} else {
 		httpServer.Handler = router
 	}
 
 	return &Server{
+		appConfig:  config,
 		httpServer: &httpServer,
 	}
 }
