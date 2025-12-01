@@ -18,7 +18,8 @@ func NewServer(router http.Handler, config config.AppConfig) *Server {
 	httpServer := http.Server{Addr: config.Port}
 
 	if config.Cors {
-		c := cors.New(cors.Options{AllowedOrigins: config.CorsOrigins, AllowCredentials: true})
+		allowedMethods := []string{"GET", "POST", "PUT", "DELETE"}
+		c := cors.New(cors.Options{AllowedOrigins: config.CorsOrigins, AllowCredentials: true, AllowedMethods: allowedMethods})
 		httpServer.Handler = c.Handler(router)
 	} else {
 		httpServer.Handler = router
