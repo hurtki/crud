@@ -100,7 +100,6 @@ func GetTaskStorage(logger slog.Logger) (TaskStorage, error) {
 	);
 	CREATE INDEX IF NOT EXISTS idx_tasks_id ON tasks(id);
 	`)
-
 	if err != nil {
 		return TaskStorage{}, fmt.Errorf("cannot create notes table: %s", err.Error())
 	}
