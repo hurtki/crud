@@ -10,11 +10,6 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-type TaskStorage struct {
-	db     *sql.DB
-	logger *slog.Logger
-}
-
 const (
 	// DB_MAX_CONNECTIONS_PERCENT_TO_POSTGRES_MAX - constant is a percent of db connections
 	// from postgres max connections
@@ -28,13 +23,15 @@ const (
 	retryTimeBetweenTries        = 1 * time.Second
 )
 
-func GetTaskStorage(logger slog.Logger) (TaskStorage, error) {
-	fn := "internal.db.db.GetStorage"
+func GetDb(logger *slog.Logger) (*sql.DB, error) {
+	fn := "internal.repo.tasks.GetDb"
+
 	db_host := os.Getenv("DB_HOST")
 	postgres_user := os.Getenv("POSTGRES_USER")
 	postgres_password := os.Getenv("POSTGRES_PASSWORD")
 	postgres_db := os.Getenv("POSTGRES_DB")
 	db_port := os.Getenv("DB_PORT")
+
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", postgres_user, postgres_password, db_host, db_port, postgres_db)
 
 	var db *sql.DB
@@ -61,7 +58,7 @@ func GetTaskStorage(logger slog.Logger) (TaskStorage, error) {
 
 	if err != nil {
 		logger.Error("Can't establish connection with database", "source", fn, "err", err)
-		return TaskStorage{}, fmt.Errorf("%s:%w", fn, err)
+		return nil, fmt.Errorf("%s:%w", fn, err)
 	}
 
 	maxConnectionsRow := db.QueryRow(`
@@ -70,7 +67,7 @@ func GetTaskStorage(logger slog.Logger) (TaskStorage, error) {
 	var maxPostgresConnections int
 	if err := maxConnectionsRow.Scan(&maxPostgresConnections); err != nil {
 		logger.Error("cannot get postgres max connections", "err", err, "source", fn)
-		return TaskStorage{}, fmt.Errorf("can't get postgres max connections, can't intialize storage: %w", err)
+		return nil, fmt.Errorf("can't get postgres max connections, can't intialize storage: %w", err)
 	}
 
 	logger.Info("got postgres max connections count", "count", maxPostgresConnections, "source", fn)
@@ -85,24 +82,6 @@ func GetTaskStorage(logger slog.Logger) (TaskStorage, error) {
 	db.SetMaxIdleConns(dbMaxIdleCons)
 	logger.Info("setting connection life time", "count", connectionLifiTime, "source", fn)
 	db.SetConnMaxLifetime(connectionLifiTime)
-
-	storage := TaskStorage{
-		logger: logger.With("service", "DataBase"),
-		db:     db,
-	}
-
-	// tasks table
-	_, err = db.Exec(`
-	CREATE TABLE IF NOT EXISTS tasks (
-		id SERIAL PRIMARY KEY,
-		name TEXT NOT NULL,
-		text TEXT NOT NULL
-	);
-	CREATE INDEX IF NOT EXISTS idx_tasks_id ON tasks(id);
-	`)
-	if err != nil {
-		return TaskStorage{}, fmt.Errorf("cannot create notes table: %s", err.Error())
-	}
-
-	return storage, nil
+	return db, nil
 }
+

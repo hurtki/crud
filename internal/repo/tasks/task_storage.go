@@ -1,11 +1,41 @@
 package tasks_repo
 
 import (
+	"database/sql"
 	"errors"
+	"fmt"
+	"log/slog"
 
 	"github.com/hurtki/crud/internal/domain/tasks"
 	repoerr "github.com/hurtki/crud/internal/repo"
 )
+
+type TaskStorage struct {
+	db     *sql.DB
+	logger *slog.Logger
+}
+
+func GetTaskStorage(logger slog.Logger, db *sql.DB) (TaskStorage, error) {
+	storage := TaskStorage{
+		logger: logger.With("service", "DataBase"),
+		db:     db,
+	}
+	// tasks table
+	_, err := db.Exec(`
+	CREATE TABLE IF NOT EXISTS tasks (
+		id SERIAL PRIMARY KEY,
+		name TEXT NOT NULL,
+		text TEXT NOT NULL
+	);
+	CREATE INDEX IF NOT EXISTS idx_tasks_id ON tasks(id);
+	`)
+
+	if err != nil {
+		return TaskStorage{}, fmt.Errorf("cannot create notes table: %s", err.Error())
+	}
+
+	return storage, nil
+}
 
 func (s *TaskStorage) List(pag tasks.Pagination) ([]tasks.Task, error) {
 	fn := "internal.repo.tasks.TaskStorage.List"

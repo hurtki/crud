@@ -11,7 +11,6 @@ import (
 	"github.com/hurtki/crud/internal/server"
 	"github.com/hurtki/routego"
 
-	//"github.com/hurtki/crud/internal/config"
 	"github.com/hurtki/crud/internal/domain/tasks"
 	tasks_repo "github.com/hurtki/crud/internal/repo/tasks"
 
@@ -20,16 +19,23 @@ import (
 
 func main() {
 	logger := logger.NewLogger()
-	// config := config.NewAppConfig(":80", tasksPerPageCount, time.Second*5)
+	logger.Info("logger initialized")
+
 	config, err := config.LoadConfig("config.yaml")
 	if err != nil {
 		logger.Error("can't load config, exiting", "err", err)
+		os.Exit(0)
 	}
 	logger.Info(fmt.Sprintf("loaded app config: %s", config.String()))
 
-	logger.Info("logger initialized")
+	db, err := tasks_repo.GetDb(logger)
 
-	storage, err := tasks_repo.GetTaskStorage(*logger)
+	if err != nil {
+		logger.Error("can't init database", "err", err)
+		os.Exit(0)
+	}
+
+	storage, err := tasks_repo.GetTaskStorage(*logger, db)
 
 	if err != nil {
 		logger.Error("Can't initialize storage, exiting", "err", err)
