@@ -1,10 +1,12 @@
-# crudl is a pet project of basic crudl service to rule tasks written in go
+# crud is a pet project of basic crudl\* service to rule tasks written in go
+
+> \*yeah there is also a List endpoint but `crud` sound just better, so live with that
 
 ## Main points:
 
-- written using DI - Dependency Injection ( full implementation of DI)
+- written using DI - Dependency Injection
 - clean architecture with config, logger, storage, handlers as separeted modules
-- initialization of all dependencies in Main.go
+- initialization of all dependencies in `main.go`
 - docker-compose with Postgres db service
 
 # CRUDL Endpoints:
@@ -64,7 +66,9 @@
 `Code:200`
 
 ### **L - `/tasks` `GET`**
+
 ### **- `/tasks/?page={int}` `GET`**
+
 `Request`None
 `Response`:
 
