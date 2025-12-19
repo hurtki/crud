@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"log/slog"
-	"os"
 	"time"
 
+	"github.com/hurtki/crud/internal/config"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
@@ -23,16 +23,10 @@ const (
 	retryTimeBetweenTries        = 1 * time.Second
 )
 
-func GetDb(logger *slog.Logger) (*sql.DB, error) {
+func GetDb(logger *slog.Logger, pgConf *config.PostgresConfig) (*sql.DB, error) {
 	fn := "internal.repo.tasks.GetDb"
 
-	db_host := os.Getenv("DB_HOST")
-	postgres_user := os.Getenv("POSTGRES_USER")
-	postgres_password := os.Getenv("POSTGRES_PASSWORD")
-	postgres_db := os.Getenv("POSTGRES_DB")
-	db_port := os.Getenv("DB_PORT")
-
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", postgres_user, postgres_password, db_host, db_port, postgres_db)
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", pgConf.User, pgConf.Password, pgConf.Host, pgConf.Port, pgConf.DbName)
 
 	var db *sql.DB
 	var err error
@@ -48,7 +42,7 @@ func GetDb(logger *slog.Logger) (*sql.DB, error) {
 		}
 
 		if err := db.Ping(); err != nil {
-			logger.Warn(fmt.Sprintf("Cannot ping database, try number: %d/%d", i+1, dataBaseConnectionTriesCount), "source", fn)
+			logger.Warn(fmt.Sprintf("Cannot ping database, try number: %d/%d", i+1, dataBaseConnectionTriesCount), "source", fn, "err", err)
 			time.Sleep(retryTimeBetweenTries)
 			continue
 		}
@@ -84,4 +78,3 @@ func GetDb(logger *slog.Logger) (*sql.DB, error) {
 	db.SetConnMaxLifetime(connectionLifiTime)
 	return db, nil
 }
-

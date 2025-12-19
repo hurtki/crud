@@ -7,7 +7,7 @@ services:
     networks:
       - crud-net
     ports:
-      - 80:80
+      - "${APP_PORT}:80"
     depends_on:
       - postgres
     env_file: .env

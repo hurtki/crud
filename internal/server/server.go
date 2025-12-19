@@ -15,7 +15,7 @@ type Server struct {
 }
 
 func NewServer(router http.Handler, config config.AppConfig) *Server {
-	httpServer := http.Server{Addr: ":80"}
+	httpServer := http.Server{Addr: config.InternalPort}
 
 	if config.Cors {
 		allowedMethods := []string{"GET", "POST", "PUT", "DELETE"}

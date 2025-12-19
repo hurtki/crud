@@ -21,14 +21,16 @@ func main() {
 	logger := logger.NewLogger()
 	logger.Info("logger initialized")
 
-	config, err := config.LoadConfig("config.yaml")
+	appConfig, err := config.LoadConfig("config.yaml")
 	if err != nil {
 		logger.Error("can't load config, exiting", "err", err)
 		os.Exit(0)
 	}
-	logger.Info(fmt.Sprintf("loaded app config: %s", config.String()))
+	logger.Info(fmt.Sprintf("loaded app config: %s", appConfig.String()))
 
-	db, err := tasks_repo.GetDb(logger)
+	pgConf := config.LoadPgConfig()
+
+	db, err := tasks_repo.GetDb(logger, pgConf)
 
 	if err != nil {
 		logger.Error("can't init database", "err", err)
@@ -42,7 +44,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	tasksUseCases := tasks.NewTaskUseCases(&storage, config)
+	tasksUseCases := tasks.NewTaskUseCases(&storage, appConfig)
 
 	tasksHandler := tasksHandler.NewTasksHandler(*logger, tasksUseCases)
 
@@ -51,7 +53,7 @@ func main() {
 	routeSet.Add("/tasks/", tasksHandler.ServeCreateList)
 	router := routego.NewRouter(routeSet)
 
-	srv := server.NewServer(&router, *config)
+	srv := server.NewServer(&router, *appConfig)
 
 	srvErrChan := make(chan error)
 	srv.Start(srvErrChan)

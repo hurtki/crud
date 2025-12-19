@@ -1,6 +1,5 @@
 # you need to create 'config.yaml' with this configurstion
-port: ":80"
 tasks_per_page: 10
 time_to_shut_down: 5s
 cors: true
-cors_origins: ["https://api.myapp.com"]
+cors_origins: ["https://myapp.com"]

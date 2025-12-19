@@ -3,14 +3,17 @@ package config
 import (
 	"fmt"
 	"os"
-	"regexp"
 	"time"
 
 	"gopkg.in/yaml.v2"
 )
 
+const (
+	internalAppPort = ":80"
+)
+
 type AppConfig struct {
-	Port                 string        `yaml:"port"`              // :port_id
+	InternalPort         string        // :port_id
 	TasksPerPageCount    int           `yaml:"tasks_per_page"`    // count of tasks that will be on list endpoint on every page ( limit )
 	ServerTimeToShutDown time.Duration `yaml:"time_to_shut_down"` // time to wait to close http server, when gracefull shutdown intialized
 	Cors                 bool          `yaml:"use_cors"`          // if the server will use cors midlleware
@@ -28,11 +31,6 @@ func LoadConfig(path string) (*AppConfig, error) {
 		return nil, err
 	}
 
-	portRe := regexp.MustCompile(`^:\d{1,5}$`)
-	if !portRe.MatchString(cfg.Port) {
-		return nil, ErrWrongPortSpecified
-	}
-
 	if cfg.TasksPerPageCount < 1 {
 		return nil, ErrTasksPerPageSmallerThanOne
 	}
@@ -45,18 +43,20 @@ func LoadConfig(path string) (*AppConfig, error) {
 		return nil, ErrNoOriginsWithCors
 	}
 
+	cfg.InternalPort = internalAppPort
+
 	return &cfg, nil
 }
 
 func (c AppConfig) String() string {
 	return fmt.Sprintf(
 		"AppConfig: "+
-			"  Port: %s "+
+			"  InternalPort ( in container ): %s "+
 			"  TasksPerPageCount: %d "+
 			"  ServerTimeToShutDown: %s "+
 			"  Cors: %t "+
 			"  CorsOrigins: %v ",
-		c.Port,
+		c.InternalPort,
 		c.TasksPerPageCount,
 		c.ServerTimeToShutDown,
 		c.Cors,
