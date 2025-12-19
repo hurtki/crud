@@ -8,6 +8,7 @@ import (
 
 	tasksHandler "github.com/hurtki/crud/internal/app/tasks"
 	"github.com/hurtki/crud/internal/config"
+	"github.com/hurtki/crud/internal/middleware"
 	"github.com/hurtki/crud/internal/server"
 	"github.com/hurtki/routego"
 
@@ -53,7 +54,10 @@ func main() {
 	routeSet.Add("/tasks/", tasksHandler.ServeCreateList)
 	router := routego.NewRouter(routeSet)
 
-	srv := server.NewServer(&router, *appConfig)
+	srv := server.NewServer(&router, *appConfig,
+		middleware.LoggingMiddleware(logger),
+		middleware.CorsMiddleware(appConfig),
+	)
 
 	srvErrChan := make(chan error)
 	srv.Start(srvErrChan)
