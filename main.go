@@ -19,15 +19,16 @@ import (
 )
 
 func main() {
-	logger := logger.NewLogger()
-	logger.Info("logger initialized")
-
 	appConfig, err := config.LoadConfig("config.yaml")
 	if err != nil {
-		logger.Error("can't load config, exiting", "err", err)
+		fmt.Println("can't load config, exiting", "err", err)
 		os.Exit(0)
 	}
-	logger.Info(fmt.Sprintf("loaded app config: %s", appConfig.String()))
+
+	fmt.Printf("loaded app config: %s\n", appConfig.String())
+
+	logger := logger.NewLogger(appConfig.LoggingLevel)
+	logger.Info("logger initialized")
 
 	pgConf := config.LoadPgConfig()
 

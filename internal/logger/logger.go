@@ -5,9 +5,9 @@ import (
 	"os"
 )
 
-func NewLogger() *slog.Logger {
+func NewLogger(level slog.Level) *slog.Logger {
 	handlerOptions := &slog.HandlerOptions{
-		Level: slog.Level(0),
+		Level: level,
 	}
 	handler := slog.NewTextHandler(os.Stdout, handlerOptions)
 	logger := slog.New(handler)
