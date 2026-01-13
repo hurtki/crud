@@ -33,12 +33,25 @@ func LoggingMiddleware(logger *slog.Logger) server.Middleware {
 			before := time.Now()
 			next.ServeHTTP(rw, r)
 
-			logger.Info("request completed",
+			args := []any{
 				"method", r.Method,
 				"path", r.URL.Path,
 				"status", rw.status,
 				"duration_ms", time.Since(before).Milliseconds(),
-			)
+			}
+
+			switch rw.status / 100 {
+			case 2:
+				logger.Info("request completed", args...)
+			case 3:
+				logger.Debug("request redirected", args...)
+			case 4:
+				logger.Info("bad request", args...)
+			case 5:
+				logger.Error("request server error", args...)
+			default:
+				logger.Warn("unknown response status", args...)
+			}
 		})
 
 	}
