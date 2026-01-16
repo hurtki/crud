@@ -5,7 +5,7 @@
 ## Main points:
 
 - written using DI - Dependency Injection
-- clean architecture with config, logger, storage, handlers as separeted modules
+- clean architecture with config, logger, storage, handlers, HTTPServer, middlewares as separeted modules
 - initialization of all dependencies in `main.go`
 - docker-compose with Postgres db service
 
@@ -92,5 +92,6 @@
 ## Fast start
 
 - set up `.env` using `.env.example`
+- set up `config.yaml` using `config_example.yaml`
 - install `docker` + `docker-compose`
 - run `docker compose up --build` or add `-d` flag at the end to leave after all started
