@@ -1,4 +1,4 @@
-package tasks_repo
+package db_infra
 
 import (
 	"database/sql"
@@ -24,7 +24,7 @@ const (
 )
 
 func GetDb(logger *slog.Logger, pgConf *config.PostgresConfig) (*sql.DB, error) {
-	fn := "internal.repo.tasks.GetDb"
+	fn := "internal.infra.db.GetDb"
 
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", pgConf.User, pgConf.Password, pgConf.Host, pgConf.Port, pgConf.DbName)
 
@@ -36,13 +36,14 @@ func GetDb(logger *slog.Logger, pgConf *config.PostgresConfig) (*sql.DB, error) 
 		db, err = sql.Open("pgx", dsn)
 
 		if err != nil {
-			logger.Warn(fmt.Sprintf("Cannot open database(retrying in 1 second), try number: %d/%d", i+1, dataBaseConnectionTriesCount), "source", fn)
+			logger.Warn(fmt.Sprintf("Cannot open database(retrying in %s), try number: %d/%d", retryTimeBetweenTries.String(), i+1, dataBaseConnectionTriesCount), "source", fn)
 			time.Sleep(retryTimeBetweenTries)
 			continue
 		}
 
 		if err := db.Ping(); err != nil {
 			logger.Warn(fmt.Sprintf("Cannot ping database, try number: %d/%d", i+1, dataBaseConnectionTriesCount), "source", fn, "err", err)
+			_ = db.Close()
 			time.Sleep(retryTimeBetweenTries)
 			continue
 		}

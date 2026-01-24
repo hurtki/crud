@@ -8,6 +8,7 @@ import (
 
 	tasksHandler "github.com/hurtki/crud/internal/app/tasks"
 	"github.com/hurtki/crud/internal/config"
+	db_infra "github.com/hurtki/crud/internal/infra/db"
 	"github.com/hurtki/crud/internal/middleware"
 	"github.com/hurtki/crud/internal/server"
 	"github.com/hurtki/routego"
@@ -32,19 +33,20 @@ func main() {
 
 	pgConf := config.LoadPgConfig()
 
-	db, err := tasks_repo.GetDb(logger, pgConf)
+	db, err := db_infra.GetDb(logger, pgConf)
 
 	if err != nil {
-		logger.Error("can't init database", "err", err)
+		logger.Error("can't initialize connection with database", "err", err)
 		os.Exit(0)
 	}
 
-	storage, err := tasks_repo.GetTaskStorage(*logger, db)
-
+	err = tasks_repo.ApplyTasksSchema(db)
 	if err != nil {
-		logger.Error("Can't initialize storage, exiting", "err", err)
+		logger.Error("can't apply tasks sql schema for database", "err", err)
 		os.Exit(0)
 	}
+
+	storage := tasks_repo.GetTaskStorage(*logger, db)
 
 	tasksUseCases := tasks.NewTaskUseCases(&storage, appConfig)
 
