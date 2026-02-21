@@ -71,7 +71,13 @@ func (h *TasksHandler) HandleUpdate(res http.ResponseWriter, req *http.Request) 
 		return
 	}
 
-	serialized, err := json.Marshal(task)
+	resDto := TaskResponse{
+		Id:   task.Id,
+		Name: task.Name,
+		Text: task.Text,
+	}
+
+	serialized, err := json.Marshal(resDto)
 
 	if err != nil {
 		h.logger.Error("error serializing task into json", "source", fn, "err", err)

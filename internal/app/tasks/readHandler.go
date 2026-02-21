@@ -37,8 +37,7 @@ func (h *TasksHandler) HandleRead(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	serialized, err := json.Marshal(task)
-
+	serialized, err := json.Marshal(TaskResponse{Id: task.Id, Name: task.Name, Text: task.Text})
 	if err != nil {
 		h.logger.Error("error serializing task into json", "source", fn, "err", err)
 		writeJSONError(res, http.StatusInternalServerError, "cannot serialize task to json")

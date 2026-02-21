@@ -38,7 +38,16 @@ func (h *TasksHandler) HandleList(res http.ResponseWriter, req *http.Request) {
 		writeJSONError(res, http.StatusInternalServerError, "cannot list tasks")
 		return
 	}
-	serialized, err := json.Marshal(tasks)
+	resDto := make([]TaskResponse, len(tasks))
+	for i := range len(tasks) {
+		resDto[i] = TaskResponse{
+			Id:   tasks[i].Id,
+			Name: tasks[i].Name,
+			Text: tasks[i].Text,
+		}
+
+	}
+	serialized, err := json.Marshal(resDto)
 
 	if err != nil {
 		h.logger.Error("error serializing tasks in to json", "source", fn, "err", err)

@@ -74,8 +74,8 @@
 
 ```json
 [
-  { "Id": 1, "Name": "12.01.2025", "Text": "it's finally 2025" },
-  { "Id": 2, "Name": "12.11.2025", "Text": "i don't belive i survived" }
+  { "id": 1, "name": "12.01.2025", "text": "it's finally 2025" },
+  { "id": 2, "name": "12.11.2025", "text": "i don't belive i survived" }
 ]
 ```
 

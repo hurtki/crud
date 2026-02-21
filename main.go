@@ -52,10 +52,14 @@ func main() {
 
 	tasksHandler := tasksHandler.NewTasksHandler(*logger, tasksUseCases)
 
-	routeSet := routego.NewRouteSet()
-	routeSet.Add("/tasks/{num}", tasksHandler.ServeReadUpdateDelete)
-	routeSet.Add("/tasks/", tasksHandler.ServeCreateList)
-	router := routego.NewRouter(routeSet)
+	router := routego.NewRouter(nil)
+
+	router.GetFunc("/tasks/{num}", tasksHandler.HandleRead)
+	router.PutFunc("/tasks/{num}", tasksHandler.HandleUpdate)
+	router.DeleteFunc("/tasks/{num}", tasksHandler.HandleDelete)
+
+	router.GetFunc("/tasks/", tasksHandler.HandleList)
+	router.PostFunc("/tasks/", tasksHandler.HandleCreate)
 
 	srv := server.NewServer(&router, *appConfig,
 		middleware.LoggingMiddleware(logger),

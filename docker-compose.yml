@@ -19,9 +19,9 @@ services:
     networks:
       - crud-net
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - crud_pgdata:/var/lib/postgresql/data
 volumes:
-  pgdata:
+  crud_pgdata:
     name: postgres_db_crud
 networks:
   crud-net:
