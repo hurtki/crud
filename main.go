@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 
+	"github.com/hurtki/crud/internal/app"
 	tasksHandler "github.com/hurtki/crud/internal/app/tasks"
 	"github.com/hurtki/crud/internal/config"
 	db_infra "github.com/hurtki/crud/internal/infra/db"
@@ -52,7 +54,7 @@ func main() {
 
 	tasksHandler := tasksHandler.NewTasksHandler(*logger, tasksUseCases)
 
-	router := routego.NewRouter(nil)
+	router := routego.NewRouter(&routego.RouterConfig{NotFoundHandler: http.HandlerFunc(app.NotFoundHandle)})
 
 	router.GetFunc("/tasks/{num}", tasksHandler.HandleRead)
 	router.PutFunc("/tasks/{num}", tasksHandler.HandleUpdate)
