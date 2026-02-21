@@ -3,7 +3,7 @@ module github.com/hurtki/crud
 go 1.25.4
 
 require (
-	github.com/hurtki/routego v0.1.5
+	github.com/hurtki/routego v0.1.6
 	github.com/jackc/pgx/v5 v5.7.6
 	github.com/rs/cors v1.11.1
 	gopkg.in/yaml.v2 v2.4.0
